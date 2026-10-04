@@ -1,0 +1,42 @@
+name: Pipeline (CI/CD)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ETAPA DE CI: Testa o código antes de qualquer junção
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixa o código do repositório
+        uses: actions/checkout@v4
+        
+      - name: Configura o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          
+      - name: Instala bibliotecas
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Roda os Testes (pytest)
+        run: |
+          pytest tests/
+
+  # ETAPA DE CD: Só ocorre na 'main' e se os testes passarem
+  build-and-push-docker:
+    needs: test 
+    if: github.ref == 'refs/heads/main' 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build da Imagem Docker
+        run: docker build -t modelo-ml-grupo:latest .
+        
+      # (Opcional) Passo para logar no GitHub Container Registry ou Docker Hub 
+      # e enviar a imagem com 'docker push' para que qualquer pessoa consiga baixá-la.
