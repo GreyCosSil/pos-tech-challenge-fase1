@@ -1,4 +1,4 @@
-# 🤖 Nome do Projeto de Machine Learning
+# 🤖 Modelo preditivo de churn para empresa do setor de Telecomunicaçoes
 
 Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvido para prever a evasão de clientes (Churn) utilizando Random Forest, como trabalho de conclusão da pós-graduação."
 
@@ -19,7 +19,7 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    cd pos-tech-challenge-fase1
 
 ## Recomenda-se criar ambiente virtual
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # No Windows use: venv\Scripts\activate
 
 ## instalacao de dependencias
