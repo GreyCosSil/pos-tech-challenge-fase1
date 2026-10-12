@@ -26,9 +26,12 @@ source venv/bin/activate  # No Windows use: venv\Scripts\activate
 pip install -r requirements.txt
 
 ## Execucao
-### Treino Modelo
-python src/train.py
+<!-- ### Treino Modelo
+python src/train.py -->
 
-### Via Docker
+## Tests
+python tests/test_main.py
+
+<!-- ### Via Docker
 docker build -t meu-modelo-ml .
-docker run -p 8000:8000 meu-modelo-ml
+docker run -p 8000:8000 meu-modelo-ml -->
