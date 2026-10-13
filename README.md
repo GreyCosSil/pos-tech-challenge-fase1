@@ -19,19 +19,26 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    cd pos-tech-challenge-fase1
 
 ## Recomenda-se criar ambiente virtual
+
+```bash
 python3 -m venv venv
 source venv/bin/activate  # No Windows use: venv\Scripts\activate
+```
 
 ## instalacao de dependencias
+```bash
 pip install -r requirements.txt
+```
 
 ## Execucao
 <!-- ### Treino Modelo
 python src/train.py -->
 
 ## Tests
+```bash
 python tests/test_main.py
+```
 
-<!-- ### Via Docker
+<!-- ### Via Dockers
 docker build -t meu-modelo-ml .
 docker run -p 8000:8000 meu-modelo-ml -->

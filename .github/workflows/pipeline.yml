@@ -27,16 +27,16 @@ jobs:
         run: |
           pytest tests/
 
-  # ETAPA DE CD: Só ocorre na 'main' e se os testes passarem
-  build-and-push-docker:
-    needs: test 
-    if: github.ref == 'refs/heads/main' 
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # # ETAPA DE CD: Só ocorre na 'main' e se os testes passarem
+  # build-and-push-docker:
+  #   needs: test 
+  #   if: github.ref == 'refs/heads/main' 
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
       
-      - name: Build da Imagem Docker
-        run: docker build -t modelo-ml-grupo:latest .
+  #     - name: Build da Imagem Docker
+  #       run: docker build -t modelo-ml-grupo:latest .
         
-      # (Opcional) Passo para logar no GitHub Container Registry ou Docker Hub 
-      # e enviar a imagem com 'docker push' para que qualquer pessoa consiga baixá-la.
+  #     # (Opcional) Passo para logar no GitHub Container Registry ou Docker Hub 
+  #     # e enviar a imagem com 'docker push' para que qualquer pessoa consiga baixá-la.
