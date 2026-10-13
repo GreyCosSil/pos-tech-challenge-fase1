@@ -1,0 +1,34 @@
+# Ambientes Virtuais
+.env
+.venv/
+env/
+venv/
+
+# Cache e artefatos do Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Dados (NUNCA suba dados pro GitHub)
+data/
+*.csv
+*.tsv
+*.parquet
+*.json
+!data/.gitkeep  # Permite subir a pasta 'data' vazia
+
+# Modelos treinados (Pesados demais para o Git)
+models/
+*.pkl
+*.h5
+*.pt
+*.joblib
+!models/.gitkeep # Permite subir a pasta 'models' vazia
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
