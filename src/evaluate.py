@@ -1,5 +1,9 @@
 """
-Avaliação de modelos de classificação JÁ TREINADOS (Recall e PR-AUC).
+Avaliação de modelos de classificação JÁ TREINADOS
+(Recall, PR-AUC, Precision e F1-Score).
+
+O RECALL é o critério de decisão: o melhor modelo é o de maior Recall.
+PR-AUC, Precision e F1-Score são métricas complementares.
 
 O treinamento acontece em ``src/train.py``. Este módulo apenas carrega e
 avalia os modelos, sem treinar nem alterar nenhum deles.
@@ -21,22 +25,28 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import (
     average_precision_score,
+    f1_score,
     precision_recall_curve,
+    precision_score,
     recall_score,
 )
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
+# Métricas calculadas, na ordem em que aparecem nas tabelas
+_METRICAS = ("recall", "precision", "f1", "pr_auc")
+_ROTULOS = {
+    "recall": "Recall",
+    "precision": "Precision",
+    "f1": "F1-Score",
+    "pr_auc": "PR-AUC",
+}
 
-# --------------------------------------------------------------------------- #
-# Carregamento
-# --------------------------------------------------------------------------- #
+
 def carregar_modelos(diretorio="models", extensoes=(".joblib", ".pkl")):
     """Carrega todos os modelos salvos (com ``joblib.dump``) em um diretório.
 
-    O nome de cada modelo é o nome do arquivo sem extensão,
-    ex.: ``models/random_forest.joblib`` → ``"random_forest"``.
-
+    O nome de cada modelo é o nome do arquivo sem extensão.
     Retorna um dicionário {nome: modelo}.
     """
     diretorio = Path(diretorio)
@@ -49,9 +59,6 @@ def carregar_modelos(diretorio="models", extensoes=(".joblib", ".pkl")):
     return {arquivo.stem: joblib.load(arquivo) for arquivo in arquivos}
 
 
-# --------------------------------------------------------------------------- #
-# Funções auxiliares
-# --------------------------------------------------------------------------- #
 def _normalizar_modelos(modelos):
     """Aceita dicionário {nome: modelo} ou lista de modelos."""
     if isinstance(modelos, dict):
@@ -101,39 +108,35 @@ def _prever_classes(modelo, X, scores, limiar):
 def _calcular_metricas(y_true, y_pred, scores):
     return {
         "recall": recall_score(y_true, y_pred, pos_label=1, zero_division=0),
+        "precision": precision_score(y_true, y_pred, pos_label=1, zero_division=0),
+        "f1": f1_score(y_true, y_pred, pos_label=1, zero_division=0),
         "pr_auc": average_precision_score(y_true, scores, pos_label=1),
     }
 
 
-# --------------------------------------------------------------------------- #
-# Função principal
-# --------------------------------------------------------------------------- #
 def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
-    """Avalia classificadores binários já treinados com Recall e PR-AUC.
+    """Avalia classificadores binários já treinados.
+
+    Métricas: Recall (critério de decisão), Precision, F1-Score e PR-AUC.
 
     Parâmetros
     ----------
-    modelos : dict {nome: modelo} ou lista de modelos scikit-learn treinados
-        (Regressão Logística, Árvore de Decisão, Random Forest, MLP, Pipelines…).
+    modelos : dict {nome: modelo} ou lista de modelos scikit-learn treinados.
     X_teste, y_teste : dados de teste. A classe positiva (churn) deve ser 1.
-    limiar : limiar de decisão sobre a probabilidade, usado no Recall.
-    ordenar_por : coluna usada para ordenar o resultado ("pr_auc" ou "recall").
+    limiar : limiar de decisão usado em Recall, Precision e F1-Score.
+    ordenar_por : "recall" (padrão), "precision", "f1" ou "pr_auc".
 
     Retorna
     -------
-    pd.DataFrame com uma linha por modelo e as colunas ``recall``, ``pr_auc``
-    e ``pr_auc_baseline`` (proporção de positivos no teste, que é a PR-AUC de
-    um modelo aleatório: um modelo útil deve ficar bem acima dela).
-
-    Exceções
-    --------
-    NotFittedError : se algum modelo não tiver sido treinado.
+    pd.DataFrame com uma linha por modelo e as colunas ``recall``,
+    ``precision``, ``f1``, ``pr_auc`` e ``pr_auc_baseline`` (proporção de
+    positivos no teste, que é a PR-AUC de um modelo aleatório).
     """
     modelos = _normalizar_modelos(modelos)
     if not modelos:
         raise ValueError("Nenhum modelo foi informado.")
-    if ordenar_por not in ("recall", "pr_auc"):
-        raise ValueError("ordenar_por deve ser 'recall' ou 'pr_auc'.")
+    if ordenar_por not in _METRICAS:
+        raise ValueError(f"ordenar_por deve ser um de {_METRICAS}.")
 
     y_teste = np.asarray(y_teste)
     baseline = float(np.mean(y_teste == 1))
@@ -154,9 +157,6 @@ def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
     )
 
 
-# --------------------------------------------------------------------------- #
-# Gráficos
-# --------------------------------------------------------------------------- #
 # Paleta Okabe-Ito: distinguível por quem tem daltonismo.
 _CORES = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9"]
 
@@ -171,29 +171,14 @@ def plotar_pr_auc(
     tabela=True,
     limiar=0.5,
 ):
-    """Plota as curvas Precisão-Revocação de modelos já treinados e, ao final,
-    a tabela comparativa dos modelos.
+    """Plota as curvas Precisão-Revocação e, ao final, a tabela comparativa.
 
-    Cada curva mostra a PR-AUC (average precision) na legenda. A linha
-    tracejada é o baseline: a proporção de positivos no teste, que é o
-    desempenho de um modelo aleatório.
+    Cada curva mostra a PR-AUC na legenda. A linha tracejada é o baseline
+    (proporção de positivos no teste = modelo aleatório). Com ``salvar_em``,
+    a tabela é salva ao lado, com o sufixo ``_tabela``.
 
-    Parâmetros
-    ----------
-    modelos : dict {nome: modelo} ou lista de modelos treinados
-        (os mesmos aceitos por ``avaliar_modelo``).
-    X_teste, y_teste : dados de teste. A classe positiva (churn) deve ser 1.
-    salvar_em : caminho para salvar a imagem das curvas (ex.: "docs/pr_auc.png").
-        A tabela é salva ao lado, com o sufixo ``_tabela`` (ex.: "docs/recall_pr_auc_tabela.png").
-    mostrar : se True, chama ``plt.show()`` (uma vez, após criar as figuras).
-    titulo : título do gráfico das curvas.
-    tabela : se True (padrão), plota a tabela comparativa ao final.
-    limiar : limiar de decisão usado no Recall da tabela.
-
-    Retorna
-    -------
-    matplotlib.figure.Figure com as curvas. A tabela, quando gerada, fica em
-    uma segunda figura (use ``plotar_tabela_comparativa`` para obtê-la).
+    Retorna a Figure das curvas; a tabela fica em uma segunda figura (use
+    ``plotar_tabela_comparativa`` para obtê-la).
     """
     modelos = _normalizar_modelos(modelos)
     if not modelos:
@@ -202,7 +187,6 @@ def plotar_pr_auc(
     y_teste = np.asarray(y_teste)
     baseline = float(np.mean(y_teste == 1))
 
-    # Ordena pela PR-AUC para a legenda ficar do melhor para o pior modelo
     curvas = []
     for nome, modelo in modelos.items():
         _validar_treinado(nome, modelo)
@@ -243,7 +227,6 @@ def plotar_pr_auc(
     if salvar_em:
         fig.savefig(salvar_em, dpi=150, bbox_inches="tight")
 
-    # Ao final, a tabela comparativa dos modelos
     if tabela:
         caminho_tabela = None
         if salvar_em:
@@ -272,66 +255,62 @@ def plotar_tabela_comparativa(
     mostrar=True,
     titulo="Comparativo dos modelos",
 ):
-    """Plota uma tabela comparando os modelos (Recall e PR-AUC).
+    """Plota uma tabela comparando Recall, Precision, F1-Score e PR-AUC.
 
-    O melhor valor de cada métrica aparece em negrito com fundo destacado, e
-    os modelos ficam ordenados pelo RECALL. A coluna "Ganho vs baseline" diz
-    quantas vezes a RECALL do modelo supera a de um classificador aleatório.
+    Os modelos ficam ordenados pelo RECALL (critério de decisão): o primeiro
+    da tabela é o melhor modelo. O melhor valor de cada métrica aparece em
+    negrito com fundo destacado (o do Recall em verde mais forte). A coluna
+    "Ganho vs baseline" é quantas vezes a PR-AUC supera a de um classificador
+    aleatório.
 
-    Parâmetros
-    ----------
-    modelos : dict {nome: modelo} ou lista de modelos já treinados.
-    X_teste, y_teste : dados de teste. A classe positiva (churn) deve ser 1.
-    limiar : limiar de decisão usado no Recall.
-    salvar_em : caminho para salvar a imagem. Opcional.
-    mostrar : se True, chama ``plt.show()``.
-
-    Retorna
-    -------
-    matplotlib.figure.Figure
+    Retorna a matplotlib.figure.Figure.
     """
-    resultados = avaliar_modelo(modelos, X_teste, y_teste, limiar=limiar)
+    resultados = avaliar_modelo(
+        modelos, X_teste, y_teste, limiar=limiar, ordenar_por="recall"
+    )
 
-    colunas = ["Modelo", "Recall", "PR-AUC", "Baseline", "Ganho vs baseline"]
+    colunas = (
+        ["Modelo"]
+        + [_ROTULOS[m] for m in _METRICAS]
+        + ["Baseline", "Ganho vs baseline"]
+    )
     linhas = [
-        [
-            nome,
-            f"{r.recall:.3f}",
-            f"{r.pr_auc:.3f}",
-            f"{r.pr_auc_baseline:.3f}",
-            f"{r.pr_auc / r.pr_auc_baseline:.1f}x",
-        ]
+        [nome]
+        + [f"{r[m]:.3f}" for m in _METRICAS]
+        + [f"{r.pr_auc_baseline:.3f}", f"{r.pr_auc / r.pr_auc_baseline:.1f}x"]
         for nome, r in resultados.iterrows()
     ]
 
-    fig, ax = plt.subplots(figsize=(8, 0.9 + 0.5 * len(linhas)))
+    melhor_modelo = resultados["recall"].idxmax()
+    fig, ax = plt.subplots(figsize=(10, 1.1 + 0.5 * len(linhas)))
     ax.axis("off")
-    ax.set_title(f"{titulo} (limiar = {limiar})", fontsize=12, pad=10)
+    ax.set_title(
+        f"{titulo} (limiar = {limiar})\nMelhor modelo pelo Recall: {melhor_modelo}",
+        fontsize=12,
+        pad=10,
+    )
 
     tabela = ax.table(
         cellText=linhas,
         colLabels=colunas,
         cellLoc="center",
         loc="center",
-        colWidths=[0.30, 0.14, 0.14, 0.14, 0.22],
+        colWidths=[0.24, 0.11, 0.11, 0.11, 0.11, 0.11, 0.17],
     )
     tabela.auto_set_font_size(False)
     tabela.set_fontsize(10.5)
     tabela.scale(1, 1.7)
 
-    # Cabeçalho
     for j in range(len(colunas)):
         celula = tabela[0, j]
         celula.set_facecolor("#2F3B4C")
         celula.set_text_props(color="white", fontweight="bold")
 
-    # Destaca o melhor valor de Recall (coluna 1) e de PR-AUC (coluna 2)
-    for j, coluna in ((1, "recall"), (2, "pr_auc")):
-        melhor = resultados[coluna].values.argmax() + 1  # +1: pula o cabeçalho
-        tabela[melhor, j].set_facecolor("#CDEBDD")
+    for j, metrica in enumerate(_METRICAS, start=1):
+        melhor = resultados[metrica].values.argmax() + 1  # +1: pula o cabeçalho
+        tabela[melhor, j].set_facecolor("#8FD3B0" if metrica == "recall" else "#CDEBDD")
         tabela[melhor, j].set_text_props(fontweight="bold")
 
-    # Alinha o nome do modelo à esquerda
     for i in range(1, len(linhas) + 1):
         tabela[i, 0].set_text_props(ha="left")
         tabela[i, 0]._loc = "left"
