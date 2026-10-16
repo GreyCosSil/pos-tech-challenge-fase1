@@ -9,3 +9,4 @@ jupyterlab==4.1.0
 # FastAPI e Uvicorn se forem servir o modelo como API:
 fastapi==0.109.0
 # uvicorn==0.27.0
+kagglehub==0.3.12

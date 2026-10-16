@@ -17,27 +17,47 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    ```bash
    git clone https://github.com/GreyCosSil/pos-tech-challenge-fase1.git
    cd pos-tech-challenge-fase1
+   ```
 
-## Recomenda-se criar ambiente virtual
+## Verifique a versão do python instalado, Necessário o Python 3.11
+   ```bash
+   python3 --version
+   ```
 
-```bash
-python3 -m venv venv
-source venv/bin/activate  # No Windows use: venv\Scripts\activate
-```
+## Caso a versão não esteja correta necessario a instalacão
+   ```bash
+   brew install python@3.11
+   ```
 
+## Recomenda-se criar ambiente virtual usando o python 3.11
+   ```bash
+   python3.11 -m venv .venv311
+   source .venv311/bin/activate  # No Windows use: venv\Scripts\activate
+   ```
+
+# Atualize as ferramentas de instalação
+   ```bash
+   python -m pip install --upgrade pip setuptools wheel
+   ```
+   
 ## instalacao de dependencias
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Execucao
-<!-- ### Treino Modelo
-python src/train.py -->
-
+### Treino Modelo
+   ```bash
+   python src/train.py
+   ```
+### notebooks
+   ```bash
+   python notebooks/eda_natalia.py
+   ```
 ## Tests
-```bash
-python tests/test_main.py
-```
+   ```bash
+   python tests/test_main.py
+   ```
 
 <!-- ### Via Dockers
 docker build -t meu-modelo-ml .
