@@ -26,7 +26,7 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
 
 ## Caso a versão não esteja correta necessario a instalacão
    ```bash
-   brew install python@3.11
+   brew reinstall python@3.11
    ```
 
 ## Recomenda-se criar ambiente virtual usando o python 3.11
@@ -35,10 +35,10 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    source .venv311/bin/activate  # No Windows use: venv\Scripts\activate
    ```
 
-# Atualize as ferramentas de instalação
+<!-- # Atualize as ferramentas de instalação
    ```bash
    python -m pip install --upgrade pip setuptools wheel
-   ```
+   ``` -->
    
 ## instalacao de dependencias
    ```bash
