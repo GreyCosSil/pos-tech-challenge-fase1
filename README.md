@@ -46,17 +46,17 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    ```
 
 ## Execucao
-### Treino Modelo
+### Carregar e visualizar os dados
    ```bash
-   python src/train.py
+   python src/main.py
    ```
 ### notebooks
    ```bash
-   python notebooks/eda_natalia.py
+   python src/eda_natalia.py
    ```
 ## Tests
    ```bash
-   python tests/test_main.py
+   python -m pytest -q
    ```
 
 <!-- ### Via Dockers
