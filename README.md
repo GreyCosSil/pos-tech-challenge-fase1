@@ -1,8 +1,8 @@
-# 🤖 Modelo preditivo de churn para empresa do setor de Telecomunicaçoes
+# Modelo preditivo de churn para empresa do setor de Telecomunicaçoes
 
 Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvido para prever a evasão de clientes (Churn) utilizando Random Forest, como trabalho de conclusão da pós-graduação."
 
-## 📁 Estrutura do Repositório
+## Estrutura do Repositório
 
 * `src/`: Código fonte para pré-processamento, treinamento e predição.
 * `notebooks/`: Análises exploratórias e protótipos de dados.
@@ -11,7 +11,7 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
 * `tests/`: Testes unitários do código.
 * `docs/`: Documentação adicional.
 
-## 🚀 Como Configurar (Setup)
+## Como Configurar (Setup)
 
 1. **Clone o repositório:**
    ```bash
