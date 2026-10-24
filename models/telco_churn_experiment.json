@@ -1,0 +1,51 @@
+{
+  "dataset": "WA_Fn-UseC_-Telco-Customer-Churn.csv",
+  "target": "Churn",
+  "positive_class": "Yes",
+  "random_state": 42,
+  "test_size": 0.2,
+  "cv_folds": 5,
+  "search_method": "GridSearchCV",
+  "primary_selection_metric": "recall_mean",
+  "secondary_selection_metric": "average_precision_mean",
+  "selection_rule": "lexicographic_descending",
+  "decision_threshold": "estimator_default_predict",
+  "best_model": "RandomForest",
+  "best_params": {
+    "model__class_weight": "balanced",
+    "model__max_depth": 4,
+    "model__max_features": "sqrt",
+    "model__min_samples_leaf": 16,
+    "model__n_estimators": 200
+  },
+  "test_metrics": {
+    "recall": 0.7834224598930482,
+    "average_precision": 0.638912150002558,
+    "precision": 0.48111658456486045,
+    "f1": 0.5961342828077314,
+    "roc_auc": 0.8365883902968302,
+    "accuracy": 0.7182398864442867,
+    "balanced_accuracy": 0.7390542251156063
+  },
+  "feature_columns": [
+    "gender",
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "tenure",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "MonthlyCharges",
+    "TotalCharges"
+  ]
+}
