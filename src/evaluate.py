@@ -1,9 +1,9 @@
 """
 Avaliação de modelos de classificação JÁ TREINADOS
-(Recall, PR-AUC, Precision e F1-Score).
+(Recall, ROC-AUC, Precision e F1-Score).
 
 O RECALL é o critério de decisão: o melhor modelo é o de maior Recall.
-PR-AUC, Precision e F1-Score são métricas complementares.
+ROC-AUC, Precision e F1-Score são métricas complementares.
 
 O treinamento acontece em ``src/train.py``. Este módulo apenas carrega e
 avalia os modelos, sem treinar nem alterar nenhum deles.
@@ -24,23 +24,26 @@ import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import (
-    average_precision_score,
     f1_score,
-    precision_recall_curve,
     precision_score,
     recall_score,
+    roc_auc_score,
+    roc_curve,
 )
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
 # Métricas calculadas, na ordem em que aparecem nas tabelas
-_METRICAS = ("recall", "precision", "f1", "pr_auc")
+_METRICAS = ("recall", "precision", "f1", "roc_auc")
 _ROTULOS = {
     "recall": "Recall",
     "precision": "Precision",
     "f1": "F1-Score",
-    "pr_auc": "PR-AUC",
+    "roc_auc": "ROC-AUC",
 }
+
+# ROC-AUC de um classificador aleatório (independe do balanceamento das classes)
+_ROC_AUC_BASELINE = 0.5
 
 
 def carregar_modelos(diretorio="models", extensoes=(".joblib", ".pkl")):
@@ -87,14 +90,14 @@ def _validar_treinado(nome, modelo):
 
 
 def _obter_scores(modelo, X):
-    """Retorna o score contínuo da classe positiva (usado na PR-AUC)."""
+    """Retorna o score contínuo da classe positiva (usado na ROC-AUC)."""
     if hasattr(modelo, "predict_proba"):
         return modelo.predict_proba(X)[:, 1]
     if hasattr(modelo, "decision_function"):
         return modelo.decision_function(X)
     raise TypeError(
         f"{type(modelo).__name__} não possui predict_proba nem decision_function; "
-        "não é possível calcular a PR-AUC."
+        "não é possível calcular a ROC-AUC."
     )
 
 
@@ -110,27 +113,27 @@ def _calcular_metricas(y_true, y_pred, scores):
         "recall": recall_score(y_true, y_pred, pos_label=1, zero_division=0),
         "precision": precision_score(y_true, y_pred, pos_label=1, zero_division=0),
         "f1": f1_score(y_true, y_pred, pos_label=1, zero_division=0),
-        "pr_auc": average_precision_score(y_true, scores, pos_label=1),
+        "roc_auc": roc_auc_score(y_true, scores),
     }
 
 
 def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
     """Avalia classificadores binários já treinados.
 
-    Métricas: Recall (critério de decisão), Precision, F1-Score e PR-AUC.
+    Métricas: Recall (critério de decisão), Precision, F1-Score e ROC-AUC.
 
     Parâmetros
     ----------
     modelos : dict {nome: modelo} ou lista de modelos scikit-learn treinados.
     X_teste, y_teste : dados de teste. A classe positiva (churn) deve ser 1.
     limiar : limiar de decisão usado em Recall, Precision e F1-Score.
-    ordenar_por : "recall" (padrão), "precision", "f1" ou "pr_auc".
+    ordenar_por : "recall" (padrão), "precision", "f1" ou "roc_auc".
 
     Retorna
     -------
     pd.DataFrame com uma linha por modelo e as colunas ``recall``,
-    ``precision``, ``f1``, ``pr_auc`` e ``pr_auc_baseline`` (proporção de
-    positivos no teste, que é a PR-AUC de um modelo aleatório).
+    ``precision``, ``f1``, ``roc_auc`` e ``roc_auc_baseline`` (0,5, que é a
+    ROC-AUC de um modelo aleatório).
     """
     modelos = _normalizar_modelos(modelos)
     if not modelos:
@@ -139,7 +142,6 @@ def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
         raise ValueError(f"ordenar_por deve ser um de {_METRICAS}.")
 
     y_teste = np.asarray(y_teste)
-    baseline = float(np.mean(y_teste == 1))
 
     linhas = []
     for nome, modelo in modelos.items():
@@ -152,7 +154,7 @@ def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
         pd.DataFrame(linhas)
         .set_index("modelo")
         .sort_values(ordenar_por, ascending=False)
-        .assign(pr_auc_baseline=baseline)
+        .assign(roc_auc_baseline=_ROC_AUC_BASELINE)
         .round(4)
     )
 
@@ -161,21 +163,21 @@ def avaliar_modelo(modelos, X_teste, y_teste, limiar=0.5, ordenar_por="recall"):
 _CORES = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9"]
 
 
-def plotar_pr_auc(
+def plotar_roc_auc(
     modelos,
     X_teste,
     y_teste,
     salvar_em=None,
     mostrar=True,
-    titulo="Curva Precisão-Revocação (PR) por modelo",
+    titulo="Curva ROC por modelo",
     tabela=True,
     limiar=0.5,
 ):
-    """Plota as curvas Precisão-Revocação e, ao final, a tabela comparativa.
+    """Plota as curvas ROC e, ao final, a tabela comparativa.
 
-    Cada curva mostra a PR-AUC na legenda. A linha tracejada é o baseline
-    (proporção de positivos no teste = modelo aleatório). Com ``salvar_em``,
-    a tabela é salva ao lado, com o sufixo ``_tabela``.
+    Cada curva mostra a ROC-AUC na legenda. A diagonal tracejada é o baseline
+    (modelo aleatório, ROC-AUC = 0,5). Com ``salvar_em``, a tabela é salva ao
+    lado, com o sufixo ``_tabela``.
 
     Retorna a Figure das curvas; a tabela fica em uma segunda figura (use
     ``plotar_tabela_comparativa`` para obtê-la).
@@ -185,38 +187,37 @@ def plotar_pr_auc(
         raise ValueError("Nenhum modelo foi informado.")
 
     y_teste = np.asarray(y_teste)
-    baseline = float(np.mean(y_teste == 1))
 
     curvas = []
     for nome, modelo in modelos.items():
         _validar_treinado(nome, modelo)
         scores = _obter_scores(modelo, X_teste)
-        precisao, revocacao, _ = precision_recall_curve(y_teste, scores, pos_label=1)
-        pr_auc = average_precision_score(y_teste, scores, pos_label=1)
-        curvas.append((nome, precisao, revocacao, pr_auc))
+        fpr, tpr, _ = roc_curve(y_teste, scores, pos_label=1)
+        roc_auc = roc_auc_score(y_teste, scores)
+        curvas.append((nome, fpr, tpr, roc_auc))
     curvas.sort(key=lambda c: c[3], reverse=True)
 
     fig, ax = plt.subplots(figsize=(7, 6.5))
-    for i, (nome, precisao, revocacao, pr_auc) in enumerate(curvas):
+    for i, (nome, fpr, tpr, roc_auc) in enumerate(curvas):
         ax.plot(
-            revocacao,
-            precisao,
-            drawstyle="steps-post",
+            fpr,
+            tpr,
             linewidth=2,
             color=_CORES[i % len(_CORES)],
-            label=f"{nome} (PR-AUC = {pr_auc:.3f})",
+            label=f"{nome} (ROC-AUC = {roc_auc:.3f})",
         )
 
-    ax.axhline(
-        baseline,
+    ax.plot(
+        [0, 1],
+        [0, 1],
         color="gray",
         linestyle="--",
         linewidth=1.2,
-        label=f"Baseline aleatório ({baseline:.3f})",
+        label=f"Baseline aleatório ({_ROC_AUC_BASELINE:.3f})",
     )
 
-    ax.set_xlabel("Revocação (Recall)")
-    ax.set_ylabel("Precisão (Precision)")
+    ax.set_xlabel("Taxa de Falsos Positivos (FPR)")
+    ax.set_ylabel("Revocação / Taxa de Verdadeiros Positivos (TPR)")
     ax.set_title(titulo)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.02)
@@ -255,13 +256,13 @@ def plotar_tabela_comparativa(
     mostrar=True,
     titulo="Comparativo dos modelos",
 ):
-    """Plota uma tabela comparando Recall, Precision, F1-Score e PR-AUC.
+    """Plota uma tabela comparando Recall, Precision, F1-Score e ROC-AUC.
 
     Os modelos ficam ordenados pelo RECALL (critério de decisão): o primeiro
     da tabela é o melhor modelo. O melhor valor de cada métrica aparece em
     negrito com fundo destacado (o do Recall em verde mais forte). A coluna
-    "Ganho vs baseline" é quantas vezes a PR-AUC supera a de um classificador
-    aleatório.
+    "Ganho vs baseline" é quantas vezes a ROC-AUC supera a de um classificador
+    aleatório (0,5).
 
     Retorna a matplotlib.figure.Figure.
     """
@@ -277,7 +278,7 @@ def plotar_tabela_comparativa(
     linhas = [
         [nome]
         + [f"{r[m]:.3f}" for m in _METRICAS]
-        + [f"{r.pr_auc_baseline:.3f}", f"{r.pr_auc / r.pr_auc_baseline:.1f}x"]
+        + [f"{r.roc_auc_baseline:.3f}", f"{r.roc_auc / r.roc_auc_baseline:.1f}x"]
         for nome, r in resultados.iterrows()
     ]
 
