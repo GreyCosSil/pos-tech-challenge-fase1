@@ -40,11 +40,19 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    python -m pip install --upgrade pip setuptools wheel
    ``` -->
    
-## instalacao de dependencias
+## Instala o projeto e as dependências de desenvolvimento
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -e '.[dev]'
    ```
-
+## Executar os testes automatizados com pytest
+   ```bash
+   pytest
+   ```
+## Subir o servidor da API com Uvicorn
+   ```bash
+   export JWT_SECRET="chave_secreta_local"
+   uvicorn app.main:app --app-dir src --reload --host 0.0.0.0 --port 8000
+   ```
 ## Execucao
 ### Carregar e visualizar os dados
    ```bash

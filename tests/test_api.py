@@ -1,8 +1,12 @@
-from fastapi.testclient import TestClient
+# from fastapi.testclient import TestClient
+import httpx
+import pytest
+from app.main import app, EXEMPLO_CLIENTE
 
-from app.main import EXEMPLO_CLIENTE, app
-
-client = TestClient(app)
+# client = TestClient(app)
+# Cria o transporte ASGI para conectar o HTTPX diretamente à aplicação FastAPI
+transport = httpx.ASGITransport(app=app)
+client = httpx.Client(transport=transport, base_url="http://testserver")
 
 
 def _token():
@@ -15,7 +19,6 @@ def _token():
 
 def _headers():
     return {"Authorization": f"Bearer {_token()}"}
-
 
 def test_health():
     response = client.get("/health")
