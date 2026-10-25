@@ -9,7 +9,7 @@ O treinamento acontece em ``src/train.py``. Este módulo apenas carrega e
 avalia os modelos, sem treinar nem alterar nenhum deles.
 
 Uso típico:
-    from src.avaliacao import avaliar_modelo, carregar_modelos
+    from src.evaluate import avaliar_modelo, carregar_modelos
 
     modelos = carregar_modelos("models/")          # ou um dict {nome: modelo}
     resultados = avaliar_modelo(modelos, X_teste, y_teste)
