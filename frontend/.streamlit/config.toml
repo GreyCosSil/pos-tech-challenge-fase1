@@ -1,0 +1,10 @@
+[theme]
+base = "light"
+# verde principal (botoes, links, destaques)
+primaryColor = "#3E8E73"
+# fundo cinza claro e cartoes brancos
+backgroundColor = "#F2F2F2"
+secondaryBackgroundColor = "#FFFFFF"
+# verde escuro para textos
+textColor = "#1F4D3F"
+font = "sans serif"

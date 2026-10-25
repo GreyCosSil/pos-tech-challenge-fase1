@@ -6,7 +6,8 @@ pytest==8.0.0
 matplotlib==3.8.2
 seaborn==0.13.2
 jupyterlab==4.1.0
-# FastAPI e Uvicorn se forem servir o modelo como API:
+joblib==1.6.0
+# FastAPI e Uvicorn para servir o modelo como API:
 fastapi==0.109.0
 # uvicorn==0.27.0
 kagglehub==1.0.3

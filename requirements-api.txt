@@ -1,0 +1,19 @@
+# Dependencias apenas da API (imagem Docker / Render)
+# O requirements.txt da raiz inclui ferramentas de analise (jupyter, matplotlib...)
+# que nao sao necessarias para servir o modelo.
+
+# scikit-learn deve ser a mesma versao usada no treino do modelo .joblib
+scikit-learn==1.4.0
+numpy==1.26.4
+pandas==2.2.0
+joblib==1.6.0
+
+fastapi==0.109.0
+uvicorn==0.27.0
+PyJWT==2.8.0
+python-dotenv==1.0.1
+python-json-logger==2.0.7
+
+# Metricas: demonstracao de arquitetura (coleta via Prometheus/Grafana na fase 2)
+prometheus-client==0.19.0
+prometheus-fastapi-instrumentator==6.1.0
