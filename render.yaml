@@ -1,0 +1,78 @@
+# =============================================================================
+# RENDER BLUEPRINT - API Telco Churn
+# =============================================================================
+# Para deploy:
+# 1. Faca push deste repositorio para o GitHub
+# 2. No Render: New > Blueprint e selecione o repositorio/branch
+# 3. Preencha ADMIN_PASSWORD e USER_PASSWORD quando solicitado
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # WEB SERVICE - API de Inferencia
+  # ===========================================================================
+  - type: web
+    name: api-telco-churn
+    runtime: docker
+    region: ohio
+    # free: desliga apos ~15 min sem uso (primeira requisicao leva ~30-60s)
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TOKEN_EXPIRE_MINUTES
+        value: "15"
+
+      # Segredos: nunca versionados
+      # generateValue: o Render gera uma chave aleatoria forte
+      - key: JWT_SECRET
+        generateValue: true
+      # sync: false = valor definido no painel do Render, fora do repositorio
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: USER_PASSWORD
+        sync: false
+
+  # ===========================================================================
+  # WEB SERVICE - Frontend (Streamlit)
+  # ===========================================================================
+  - type: web
+    name: frontend-telco-churn
+    runtime: docker
+    region: ohio
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      # URL publica da API (ajuste se o Render atribuir outro nome ao servico)
+      - key: API_URL
+        value: "https://api-telco-churn.onrender.com"
+
+  # ===========================================================================
+  # MONITORAMENTO (Prometheus + Grafana) - FASE 2
+  # ===========================================================================
+  # A instrumentacao de metricas (src/app/metrics.py e o endpoint /metrics)
+  # foi inserida a titulo de demonstracao de arquitetura. A coleta e a
+  # visualizacao com Prometheus e Grafana seriam implementadas em uma fase 2
+  # do projeto, com servicos proprios neste Blueprint, por exemplo:
+  #
+  # - type: web
+  #   name: prometheus-telco-churn
+  #   runtime: docker
+  #   dockerfilePath: ./prometheus/Dockerfile
+  #   envVars:
+  #     - key: API_TARGET
+  #       value: "api-telco-churn.onrender.com"
+  #
+  # - type: web
+  #   name: grafana-telco-churn
+  #   runtime: docker
+  #   dockerfilePath: ./grafana/Dockerfile
+  #   envVars:
+  #     - key: PROMETHEUS_URL
+  #       value: "https://prometheus-telco-churn.onrender.com"
