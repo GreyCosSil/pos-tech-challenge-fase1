@@ -43,6 +43,10 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
 ## Instala o projeto e as dependências de desenvolvimento
    ```bash
    python -m pip install -e '.[dev]'
+```
+## OU Instala as dependências com o requirements.txt
+   ```bash
+   pip install -r requirements.txt'
    ```
 ## Executar os testes automatizados com pytest
    ```bash
@@ -60,7 +64,7 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    ```
 ### notebooks
    ```bash
-   python src/eda_natalia.py
+   python src/eda.py
    ```
 ## Tests
    ```bash
