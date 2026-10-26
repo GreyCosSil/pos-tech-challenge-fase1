@@ -53,12 +53,29 @@ def load_dataset(
 
 def validate_dataset(df: pd.DataFrame) -> None:
     """Valida colunas obrigatórias, target e estrutura mínima."""
+    required_columns = {"customerID", "Churn"}
+    missing_columns = required_columns.difference(df.columns)
+
+    if missing_columns:
+        raise ValueError(
+            "Colunas obrigatórias ausentes: "
+            f"{sorted(missing_columns)}"
+        )
+
+    unexpected_target = set(df["Churn"].dropna().unique()) - {"No", "Yes"}
+    if unexpected_target:
+        raise ValueError(
+            "A variável Churn contém categorias inesperadas: "
+            f"{sorted(unexpected_target)}"
+        )
 
 
 def split_features_target(
     df: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.Series, list[str]]:
     """Separa as features da variável Churn e retorna as colunas."""
+    validate_dataset(df)
+
     feature_columns = [
         column for column in df.columns
         if column not in {"customerID", "Churn"}
@@ -71,4 +88,7 @@ def split_features_target(
         "Yes": 1,
     })
 
-    return X, y, feature_columns  # Retorna também a lista
+    if y.isna().any():
+        raise ValueError("A variável Churn contém valores ausentes.")
+
+    return X, y.astype(int), feature_columns

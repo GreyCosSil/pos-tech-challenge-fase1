@@ -24,6 +24,9 @@ import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    balanced_accuracy_score,
     f1_score,
     precision_score,
     recall_score,
@@ -114,6 +117,33 @@ def _calcular_metricas(y_true, y_pred, scores):
         "precision": precision_score(y_true, y_pred, pos_label=1, zero_division=0),
         "f1": f1_score(y_true, y_pred, pos_label=1, zero_division=0),
         "roc_auc": roc_auc_score(y_true, scores),
+    }
+
+
+def avaliar_modelo_final(modelo, X_teste, y_teste):
+    """Calcula as métricas finais do modelo campeão no teste reservado."""
+    if not hasattr(modelo, "predict_proba"):
+        raise TypeError(
+            f"{type(modelo).__name__} não possui predict_proba."
+        )
+
+    y_pred = modelo.predict(X_teste)
+    y_score = modelo.predict_proba(X_teste)[:, 1]
+
+    return {
+        "recall": float(recall_score(y_teste, y_pred, zero_division=0)),
+        "average_precision": float(
+            average_precision_score(y_teste, y_score)
+        ),
+        "precision": float(
+            precision_score(y_teste, y_pred, zero_division=0)
+        ),
+        "f1": float(f1_score(y_teste, y_pred, zero_division=0)),
+        "roc_auc": float(roc_auc_score(y_teste, y_score)),
+        "accuracy": float(accuracy_score(y_teste, y_pred)),
+        "balanced_accuracy": float(
+            balanced_accuracy_score(y_teste, y_pred)
+        ),
     }
 
 

@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Literal
 
 import joblib
-import pandas as pd
 from fastapi import Depends, FastAPI, HTTPException, Request
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, ConfigDict, Field
@@ -29,6 +28,7 @@ from app.metrics import (
     PREDICTIONS_TOTAL,
 )
 from app.middleware import LoggingMiddleware
+from src.prediction import predict_customer
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 API_VERSION = "1.0.0"
@@ -235,12 +235,9 @@ def predict(
     if not MODELO_OK:
         raise HTTPException(status_code=503, detail="Modelo nao disponivel")
 
-    features = pd.DataFrame([payload.model_dump()])[FEATURE_COLUMNS]
-    # no treino SeniorCitizen foi tratado como categorico ("0"/"1")
-    features["SeniorCitizen"] = features["SeniorCitizen"].astype(str)
-
-    pred_idx = int(modelo.predict(features)[0])
-    probs = modelo.predict_proba(features)[0]
+    prediction = predict_customer(modelo, payload.model_dump())
+    pred_idx = prediction.prediction
+    probs = [prediction.probability_no, prediction.probability_yes]
     classe = CLASSES[pred_idx]
     confidence = float(max(probs))
 

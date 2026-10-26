@@ -31,6 +31,13 @@ FEATURE_COLUMNS = [
 def prepare_features(df: DataFrame) -> pd.DataFrame:
     """Prepara as features para o modelo, incluindo codificação e tratamento de valores ausentes."""
     prepared = df.copy()
+    # Verifica se todas as colunas obrigatórias estão presentes, essa parte foi feita pela IA, mas não foi testada, então é bom validar.
+    missing_columns = set(FEATURE_COLUMNS).difference(prepared.columns)
+    if missing_columns:
+        raise ValueError(
+            "Features ausentes para o modelo: "
+            f"{sorted(missing_columns)}"
+        )
 
     prepared["SeniorCitizen"] = (
         prepared["SeniorCitizen"].astype(str)
@@ -40,7 +47,7 @@ def prepare_features(df: DataFrame) -> pd.DataFrame:
         prepared["TotalCharges"],
         errors="coerce",
     )
-    return prepared
+    return prepared[FEATURE_COLUMNS]
 
 def build_preprocessor(
     X: pd.DataFrame,
