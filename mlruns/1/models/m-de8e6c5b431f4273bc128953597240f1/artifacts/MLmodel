@@ -1,0 +1,27 @@
+artifact_path: file:C:/felipe/fiap/projeto-fase-1/pos-tech-challenge-fase1/mlruns/1/models/m-de8e6c5b431f4273bc128953597240f1/artifacts
+flavors:
+  lightgbm:
+    code: null
+    data: model.skops
+    lgb_version: 4.5.0
+    model_class: lightgbm.sklearn.LGBMClassifier
+    serialization_format: skops
+    skops_trusted_types:
+    - lightgbm.basic.Booster
+    - lightgbm.sklearn.LGBMClassifier
+    - collections.OrderedDict
+    - lightgbm.sklearn.LGBMRegressor
+  python_function:
+    data: model.skops
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.12.10
+mlflow_version: 3.14.0
+model_id: m-de8e6c5b431f4273bc128953597240f1
+model_size_bytes: 1080946
+model_uuid: m-de8e6c5b431f4273bc128953597240f1
+prompts: null
+run_id: dbef2042984d4cbf9867ccc0d7fd1a66
+utc_time_created: '2026-10-25 11:39:16.245013'

@@ -1,0 +1,23 @@
+artifact_path: file:C:/felipe/fiap/projeto-fase-1/pos-tech-challenge-fase1/mlruns/1/models/m-b7d8c25c306a46069be156de13f3c792/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.10
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: pickle
+    sklearn_version: 1.4.0
+    skops_trusted_types: null
+mlflow_version: 3.14.0
+model_id: m-b7d8c25c306a46069be156de13f3c792
+model_size_bytes: 1047743
+model_uuid: m-b7d8c25c306a46069be156de13f3c792
+prompts: null
+run_id: eb9bf6b4cb87408e83315be3996ca998
+utc_time_created: '2026-10-25 17:32:45.819109'

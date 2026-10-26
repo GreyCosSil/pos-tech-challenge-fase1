@@ -1,0 +1,22 @@
+artifact_path: file:C:/felipe/fiap/projeto-fase-1/pos-tech-challenge-fase1/mlruns/1/models/m-cb50a7bc1471461db3c261160be9c614/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.12.10
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.core.Booster
+    model_format: ubj
+    xgb_version: 2.1.4
+mlflow_version: 3.14.0
+model_id: m-cb50a7bc1471461db3c261160be9c614
+model_size_bytes: 643410
+model_uuid: m-cb50a7bc1471461db3c261160be9c614
+prompts: null
+run_id: bf5c82a432654f1699349ae209c6daff
+utc_time_created: '2026-10-25 11:39:08.998276'

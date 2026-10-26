@@ -1,0 +1,18 @@
+{
+  "cv_recall_mean": 0.4893539235471323,
+  "cv_recall_std": 0.07848791044423964,
+  "cv_pr_auc_mean": 0.636292827568637,
+  "cv_pr_auc_std": 0.031824559074885676,
+  "fit_time_seconds": 1.439951000000292,
+  "train_rows": 4930,
+  "test_rows": 2113,
+  "feature_count": 20,
+  "test_accuracy": 0.79649787032655,
+  "test_precision": 0.6458797327394209,
+  "test_recall": 0.5169340463458111,
+  "test_f1": 0.5742574257425742,
+  "test_pr_auc": 0.6332772661871274,
+  "test_roc_auc": 0.8417905939320434,
+  "test_brier_score": 0.13765068373691086,
+  "test_log_loss": 0.42130542272138705
+}
