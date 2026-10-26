@@ -1,6 +1,9 @@
 app
+<<<<<<< HEAD
 config
 data
+=======
+>>>>>>> f440e9a6bd40ead7887758699a7937276e832cd4
 eda
 evaluate
 main

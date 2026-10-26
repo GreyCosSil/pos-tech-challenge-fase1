@@ -33,3 +33,6 @@ data/
 # Sistema Operacional
 .DS_Store
 Thumbs.db
+
+#tests
+tests/conftest.py
