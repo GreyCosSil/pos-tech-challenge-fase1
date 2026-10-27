@@ -62,10 +62,6 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
    ```bash
    python src/main.py
    ```
-### notebooks
-   ```bash
-   python src/eda.py
-   ```
 ## Tests
    ```bash
    python -m pytest -q
