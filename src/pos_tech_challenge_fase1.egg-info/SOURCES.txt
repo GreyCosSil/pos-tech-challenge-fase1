@@ -1,10 +1,5 @@
 README.md
 pyproject.toml
-<<<<<<< HEAD
-src/config.py
-src/data.py
-=======
->>>>>>> f440e9a6bd40ead7887758699a7937276e832cd4
 src/eda.py
 src/evaluate.py
 src/main.py
@@ -17,10 +12,7 @@ src/app/middleware.py
 src/pos_tech_challenge_fase1.egg-info/PKG-INFO
 src/pos_tech_challenge_fase1.egg-info/SOURCES.txt
 src/pos_tech_challenge_fase1.egg-info/dependency_links.txt
-<<<<<<< HEAD
-=======
 src/pos_tech_challenge_fase1.egg-info/requires.txt
->>>>>>> f440e9a6bd40ead7887758699a7937276e832cd4
 src/pos_tech_challenge_fase1.egg-info/top_level.txt
 tests/test_api.py
 tests/test_main.py
