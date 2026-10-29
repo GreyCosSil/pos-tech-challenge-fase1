@@ -55,6 +55,8 @@ Breve descrição do que o modelo faz. Ex: "Modelo de classificação desenvolvi
 ## Subir o servidor da API com Uvicorn
    ```bash
    export JWT_SECRET="chave_secreta_local"
+   # Use uma chave aleatoria com pelo menos 32 caracteres.
+   # export JWT_SECRET="chave_secreta_local_com_32_caracteres_minimo"
    uvicorn app.main:app --app-dir src --reload --host 0.0.0.0 --port 8000
    ```
 ## Execucao
