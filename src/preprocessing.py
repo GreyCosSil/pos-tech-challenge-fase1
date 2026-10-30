@@ -31,7 +31,6 @@ FEATURE_COLUMNS = [
 def prepare_features(df: DataFrame) -> pd.DataFrame:
     """Prepara as features para o modelo, incluindo codificação e tratamento de valores ausentes."""
     prepared = df.copy()
-    # Verifica se todas as colunas obrigatórias estão presentes, essa parte foi feita pela IA, mas não foi testada, então é bom validar.
     missing_columns = set(FEATURE_COLUMNS).difference(prepared.columns)
     if missing_columns:
         raise ValueError(
