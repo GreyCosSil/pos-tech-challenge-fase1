@@ -1,4 +1,0 @@
-app
-eda
-evaluate
-main
