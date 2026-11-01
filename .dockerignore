@@ -18,5 +18,6 @@ notebooks/
 data/
 docs/
 tests/
-README.md
+## Readme deve permanecer pois é declarado no pyproject.toml
+# README.md
 .DS_Store

@@ -37,3 +37,8 @@ Thumbs.db
 
 #tests
 tests/conftest.py
+
+# Metadados gerados durante a instalação do pacote
+*.egg-info/
+*.db
+*.joblib

@@ -15,8 +15,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir .
 
 # 3. Mantém a estrutura do repositório
-COPY src/app/ ./src/app/
+COPY src/ ./src/
 COPY models/telco_churn_best_model.joblib models/telco_churn_experiment.json ./models/
+
+ENV PYTHONPATH=/app:/app/src
 
 # 4. Roda como usuário sem privilégios por segurança
 RUN useradd --create-home appuser && \
