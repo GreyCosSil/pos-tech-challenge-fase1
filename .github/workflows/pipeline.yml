@@ -35,15 +35,30 @@ jobs:
   # ETAPA 2: CD (Passagem de bastão para o Render)
   # ==========================================
   deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/stg' || github.ref == 'refs/heads/main')
     needs: test # Só executa se a etapa "test" passar sem erros
     runs-on: ubuntu-latest
     steps:
       # Se você fez o push na branch 'stg', o GitHub aciona apenas o ambiente de Staging no Render
       - name: Disparar Deploy no Render (STAGING)
         if: github.ref == 'refs/heads/stg'
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_STG }}
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_STG }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::error::Configure o secret RENDER_DEPLOY_HOOK_STG nas configurações do GitHub Actions."
+            exit 1
+          fi
+          curl --fail --show-error --silent --request POST "$RENDER_DEPLOY_HOOK"
 
       # Se você fez o push na branch 'main', o GitHub aciona apenas o ambiente de Produção no Render
       - name: Disparar Deploy no Render (PRODUÇÃO)
         if: github.ref == 'refs/heads/main'
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PROD }}
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_PROD }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::error::Configure o secret RENDER_DEPLOY_HOOK_PROD nas configurações do GitHub Actions."
+            exit 1
+          fi
+          curl --fail --show-error --silent --request POST "$RENDER_DEPLOY_HOOK"
