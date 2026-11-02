@@ -27,6 +27,8 @@ jobs:
         run: pip install .[dev]
           
       - name: Roda os Testes Unitários
+        env:
+            PYTHONPATH: ./:src/
         run: pytest tests/
 
   # ==========================================
