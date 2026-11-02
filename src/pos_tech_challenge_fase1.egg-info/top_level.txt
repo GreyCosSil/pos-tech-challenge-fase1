@@ -1,9 +1,0 @@
-app
-artifacts
-config
-data
-evaluate
-models
-prediction
-preprocessing
-training
