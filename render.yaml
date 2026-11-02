@@ -68,6 +68,6 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     envVars:
-      # Apontando para o serviço de produção recém-nomeado
+      # Apontando para a API de staging
       - key: API_URL
-        value: "https://api-telco-churn-prod.onrender.com"
+        value: "https://api-telco-churn-stg-93yo.onrender.com"
