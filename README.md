@@ -95,7 +95,7 @@ Em outro terminal, entre na pasta do projeto e ative o mesmo ambiente virtual.
 Os testes são classificados com os marcadores `unit` e `integration`:
 
 - **Unitários**: validam módulos ou funções isoladamente, usando dependências
-  simuladas quando necessário (`tests/test_main.py`).
+  simuladas quando necessário (`tests/test_data.py`).
 - **Integrados**: exercitam a aplicação FastAPI por requisições HTTP ASGI,
   verificando endpoints, autenticação, middleware e métricas (`tests/test_api.py`
   e `tests/test_metrics_and_middleware.py`).
