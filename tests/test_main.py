@@ -3,6 +3,8 @@ import pytest
 
 from src import dataset, main
 
+pytestmark = pytest.mark.unit
+
 
 def test_load_local_dataset_without_network(tmp_path, monkeypatch):
     data_path = tmp_path / dataset.DATASET_FILENAME

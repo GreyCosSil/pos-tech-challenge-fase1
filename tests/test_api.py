@@ -3,6 +3,8 @@ import httpx
 import pytest
 from app.main import app, EXEMPLO_CLIENTE
 
+pytestmark = pytest.mark.integration
+
 # client = TestClient(app)
 # Cria o transporte ASGI para conectar o HTTPX diretamente à aplicação FastAPI
 transport = httpx.ASGITransport(app=app)

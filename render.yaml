@@ -1,25 +1,48 @@
 # =============================================================================
-# RENDER BLUEPRINT - API Telco Churn
-# =============================================================================
-# Para deploy:
-# 1. Faca push deste repositorio para o GitHub
-# 2. No Render: New > Blueprint e selecione o repositorio/branch
-# 3. Preencha ADMIN_PASSWORD e USER_PASSWORD quando solicitado
+# RENDER BLUEPRINT - API Telco Churn (Staging & Produção)
 # =============================================================================
 
 services:
   # ===========================================================================
-  # WEB SERVICE - API de Inferencia
+  # 1. API DE INFERÊNCIA - STAGING (Homologação)
   # ===========================================================================
   - type: web
-    name: api-telco-churn
+    name: api-telco-churn-stg
     runtime: docker
     region: ohio
-    # free: desliga apos ~15 min sem uso (primeira requisicao leva ~30-60s)
     plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health
+    # Desativamos o autoDeploy para que apenas o GitHub Actions faça o gatilho
+    autoDeploy: false 
+    envVars:
+      - key: ENVIRONMENT
+        value: staging
+      - key: LOG_LEVEL
+        value: DEBUG # Em stg queremos ver mais logs
+      - key: TOKEN_EXPIRE_MINUTES
+        value: "15"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: USER_PASSWORD
+        sync: false
+
+  # ===========================================================================
+  # 2. API DE INFERÊNCIA - PRODUÇÃO (Oficial)
+  # ===========================================================================
+  - type: web
+    name: api-telco-churn-prod
+    runtime: docker
+    region: ohio
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    # Desativamos o autoDeploy para exigir a aprovação manual na esteira
+    autoDeploy: false 
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -27,19 +50,15 @@ services:
         value: INFO
       - key: TOKEN_EXPIRE_MINUTES
         value: "15"
-
-      # Segredos: nunca versionados
-      # generateValue: o Render gera uma chave aleatoria forte
       - key: JWT_SECRET
         generateValue: true
-      # sync: false = valor definido no painel do Render, fora do repositorio
       - key: ADMIN_PASSWORD
         sync: false
       - key: USER_PASSWORD
         sync: false
 
   # ===========================================================================
-  # WEB SERVICE - Frontend (Streamlit)
+  # 3. WEB SERVICE - Frontend (Streamlit)
   # ===========================================================================
   - type: web
     name: frontend-telco-churn
@@ -49,30 +68,6 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     envVars:
-      # URL publica da API (ajuste se o Render atribuir outro nome ao servico)
+      # Apontando para o serviço de produção recém-nomeado
       - key: API_URL
-        value: "https://api-telco-churn.onrender.com"
-
-  # ===========================================================================
-  # MONITORAMENTO (Prometheus + Grafana) - FASE 2
-  # ===========================================================================
-  # A instrumentacao de metricas (src/app/metrics.py e o endpoint /metrics)
-  # foi inserida a titulo de demonstracao de arquitetura. A coleta e a
-  # visualizacao com Prometheus e Grafana seriam implementadas em uma fase 2
-  # do projeto, com servicos proprios neste Blueprint, por exemplo:
-  #
-  # - type: web
-  #   name: prometheus-telco-churn
-  #   runtime: docker
-  #   dockerfilePath: ./prometheus/Dockerfile
-  #   envVars:
-  #     - key: API_TARGET
-  #       value: "api-telco-churn.onrender.com"
-  #
-  # - type: web
-  #   name: grafana-telco-churn
-  #   runtime: docker
-  #   dockerfilePath: ./grafana/Dockerfile
-  #   envVars:
-  #     - key: PROMETHEUS_URL
-  #       value: "https://prometheus-telco-churn.onrender.com"
+        value: "https://api-telco-churn-prod.onrender.com"

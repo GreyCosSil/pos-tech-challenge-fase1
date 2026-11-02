@@ -7,6 +7,8 @@ import pytest
 
 from app.main import app
 
+pytestmark = pytest.mark.integration
+
 # Transport ASGI nativo do httpx (funciona com qualquer versão do httpx)
 transport = httpx.ASGITransport(app=app)
 client = httpx.Client(transport=transport, base_url="http://testserver")

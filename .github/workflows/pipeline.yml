@@ -2,12 +2,14 @@ name: Pipeline (CI/CD)
 
 on:
   push:
-    branches: [ "main", "stg"]
+    branches: [ "main", "stg" ]
   pull_request:
-    branches: [ "main", "stg"]
+    branches: [ "main", "stg" ]
 
 jobs:
-  # ETAPA DE CI: Testa o código antes de qualquer junção
+  # ==========================================
+  # ETAPA 1: CI (Roda para qualquer branch)
+  # ==========================================
   test:
     runs-on: ubuntu-latest
     steps:
@@ -17,26 +19,29 @@ jobs:
       - name: Configura o Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12" # Atualizado para 3.12 para bater com seu Dockerfile
           
-      - name: Instala bibliotecas
-        run: |
-          pip install -r requirements.txt
+      - name: Instala bibliotecas via pyproject.toml
+        # O "." aponta para o diretório atual (onde está o pyproject.toml)
+        # O "[dev]" injeta as dependências opcionais onde o pytest está listado
+        run: pip install .[dev]
           
-      - name: Roda os Testes (pytest)
-        run: |
-          pytest tests/
+      - name: Roda os Testes Unitários
+        run: pytest tests/
 
-#   # ETAPA DE CD: Só ocorre na 'main' e se os testes passarem
-#   build-and-push-docker:
-#     needs: test 
-#     if: github.ref == 'refs/heads/main' 
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-      
-#       - name: Build da Imagem Docker
-#         run: docker build -t modelo-ml-grupo:latest .
-        
-#       # (Opcional) Passo para logar no GitHub Container Registry ou Docker Hub 
-#       # e enviar a imagem com 'docker push' para que qualquer pessoa consiga baixá-la.
+  # ==========================================
+  # ETAPA 2: CD (Passagem de bastão para o Render)
+  # ==========================================
+  deploy:
+    needs: test # Só executa se a etapa "test" passar sem erros
+    runs-on: ubuntu-latest
+    steps:
+      # Se você fez o push na branch 'stg', o GitHub aciona apenas o ambiente de Staging no Render
+      - name: Disparar Deploy no Render (STAGING)
+        if: github.ref == 'refs/heads/stg'
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_STG }}
+
+      # Se você fez o push na branch 'main', o GitHub aciona apenas o ambiente de Produção no Render
+      - name: Disparar Deploy no Render (PRODUÇÃO)
+        if: github.ref == 'refs/heads/main'
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PROD }}

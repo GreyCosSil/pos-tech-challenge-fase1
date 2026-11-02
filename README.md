@@ -89,16 +89,36 @@ Abra <http://localhost:8000/docs> para a documentação interativa, ou
 <http://localhost:8000/health> para verificar a saúde da API. Para encerrar,
 pressione `Ctrl+C`.
 
-## 5. Executar os testes integrados
+## 5. Executar os testes unitários e integrados
 
 Em outro terminal, entre na pasta do projeto e ative o mesmo ambiente virtual.
-Com o `.env` configurado, execute toda a suíte:
+Os testes são classificados com os marcadores `unit` e `integration`:
+
+- **Unitários**: validam módulos ou funções isoladamente, usando dependências
+  simuladas quando necessário (`tests/test_main.py`).
+- **Integrados**: exercitam a aplicação FastAPI por requisições HTTP ASGI,
+  verificando endpoints, autenticação, middleware e métricas (`tests/test_api.py`
+  e `tests/test_metrics_and_middleware.py`).
+
+Execute toda a suíte:
 
 ```bash
 python -m pytest -q
 ```
 
-Para executar somente os testes dos endpoints da API:
+Para executar somente os testes unitários:
+
+```bash
+python -m pytest -q -m unit
+```
+
+Para executar somente os testes integrados:
+
+```bash
+python -m pytest -q -m integration
+```
+
+Também é possível executar os testes dos endpoints da API:
 
 ```bash
 python -m pytest -q tests/test_api.py
@@ -129,4 +149,4 @@ docker run --rm --env-file .env -p 8000:8000 telco-churn-api
 
 A API ficará disponível em <http://localhost:8000/docs>. Encerre com `Ctrl+C`.
 Essa imagem contém as dependências de produção para servir a API; para executar
-os testes integrados, use o ambiente Python de desenvolvimento descrito acima.
+os testes, use o ambiente Python de desenvolvimento descrito acima.

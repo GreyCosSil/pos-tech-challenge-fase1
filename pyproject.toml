@@ -43,3 +43,7 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = [
+    "unit: testes isolados de funções ou módulos, com dependências simuladas",
+    "integration: testes da aplicação integrada por meio de requisições HTTP",
+]
