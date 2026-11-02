@@ -1,8 +1,0 @@
-# requirements.txt
-pandas==2.2.0
-scikit-learn==1.4.0
-# numpy==1.26.3
-pytest==8.0.0
-# FastAPI e Uvicorn se forem servir o modelo como API:
-fastapi==0.109.0
-# uvicorn==0.27.0

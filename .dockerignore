@@ -1,0 +1,23 @@
+# Segredos nunca entram na imagem
+.env
+**/.env
+
+# Ambientes virtuais e caches
+venv/
+.venv/
+.venv311/
+**/.venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# Nao necessarios para servir a API
+.git/
+frontend/
+notebooks/
+data/
+docs/
+tests/
+## Readme deve permanecer pois é declarado no pyproject.toml
+# README.md
+.DS_Store

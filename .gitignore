@@ -3,32 +3,42 @@
 .venv/
 env/
 venv/
+.venv311/
 
 # Cache e artefatos do Python
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+*.egg-info/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
 
 # Dados (NUNCA suba dados pro GitHub)
 data/
-*.csv
+# *.csv
 *.tsv
 *.parquet
-*.json
+# *.json
 !data/.gitkeep  # Permite subir a pasta 'data' vazia
 
 # Modelos treinados (Pesados demais para o Git)
-models/
+# models/
 *.pkl
 *.h5
 *.pt
-*.joblib
+# *.joblib
 !models/.gitkeep # Permite subir a pasta 'models' vazia
 
 # Sistema Operacional
 .DS_Store
 Thumbs.db
+
+#tests
+tests/conftest.py
+
+# Metadados gerados durante a instalação do pacote
+*.egg-info/
+*.db
+*.joblib

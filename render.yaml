@@ -1,0 +1,73 @@
+# =============================================================================
+# RENDER BLUEPRINT - API Telco Churn (Staging & Produção)
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # 1. API DE INFERÊNCIA - STAGING (Homologação)
+  # ===========================================================================
+  - type: web
+    name: api-telco-churn-stg
+    runtime: docker
+    region: ohio
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    # Desativamos o autoDeploy para que apenas o GitHub Actions faça o gatilho
+    autoDeploy: false 
+    envVars:
+      - key: ENVIRONMENT
+        value: staging
+      - key: LOG_LEVEL
+        value: DEBUG # Em stg queremos ver mais logs
+      - key: TOKEN_EXPIRE_MINUTES
+        value: "15"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: USER_PASSWORD
+        sync: false
+
+  # ===========================================================================
+  # 2. API DE INFERÊNCIA - PRODUÇÃO (Oficial)
+  # ===========================================================================
+  - type: web
+    name: api-telco-churn-prod
+    runtime: docker
+    region: ohio
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    # Desativamos o autoDeploy para exigir a aprovação manual na esteira
+    autoDeploy: false 
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TOKEN_EXPIRE_MINUTES
+        value: "15"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: USER_PASSWORD
+        sync: false
+
+  # ===========================================================================
+  # 3. WEB SERVICE - Frontend (Streamlit)
+  # ===========================================================================
+  - type: web
+    name: frontend-telco-churn
+    runtime: docker
+    region: ohio
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      # Apontando para o serviço de produção recém-nomeado
+      - key: API_URL
+        value: "https://api-telco-churn-prod.onrender.com"
