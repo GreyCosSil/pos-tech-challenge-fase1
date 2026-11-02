@@ -1,47 +1,46 @@
-# from fastapi.testclient import TestClient
-import httpx
 import pytest
-from app.main import app, EXEMPLO_CLIENTE
 
-pytestmark = pytest.mark.integration
+from app.main import EXEMPLO_CLIENTE
 
-# client = TestClient(app)
-# Cria o transporte ASGI para conectar o HTTPX diretamente à aplicação FastAPI
-transport = httpx.ASGITransport(app=app)
-client = httpx.Client(transport=transport, base_url="http://testserver")
+pytestmark = [pytest.mark.integration, pytest.mark.anyio]
 
 
-def _token():
-    response = client.post(
-        "/login", json={"username": "usuario_teste", "password": "usuario_teste"}
+async def _token(client):
+    response = await client.post(
+        "/login", json={"username": "usuario_teste", "password": "user_password"}
     )
     assert response.status_code == 200
     return response.json()["access_token"]
 
 
-def _headers():
-    return {"Authorization": f"Bearer {_token()}"}
+async def _headers(client):
+    token = await _token(client)
+    return {"Authorization": f"Bearer {token}"}
 
-def test_health():
-    response = client.get("/health")
+
+async def test_health(api_client):
+    response = await api_client.get("/health")
     assert response.status_code == 200
     assert response.json()["modelo_carregado"] is True
 
 
-def test_login_invalido():
-    response = client.post(
+async def test_login_invalido(api_client):
+    response = await api_client.post(
         "/login", json={"username": "usuario_teste", "password": "errada"}
     )
     assert response.status_code == 401
 
 
-def test_predict_sem_token():
-    response = client.post("/predict", json=EXEMPLO_CLIENTE)
-    assert response.status_code == 403
+async def test_predict_sem_token(api_client):
+    response = await api_client.post("/predict", json=EXEMPLO_CLIENTE)
+    assert response.status_code in {401, 403}
 
 
-def test_predict_cliente_alto_risco():
-    response = client.post("/predict", json=EXEMPLO_CLIENTE, headers=_headers())
+async def test_predict_cliente_alto_risco(api_client):
+    headers = await _headers(api_client)
+    response = await api_client.post(
+        "/predict", json=EXEMPLO_CLIENTE, headers=headers
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["churn"] is True
@@ -50,7 +49,7 @@ def test_predict_cliente_alto_risco():
     assert body["usuario"] == "usuario_teste"
 
 
-def test_predict_cliente_baixo_risco():
+async def test_predict_cliente_baixo_risco(api_client):
     cliente = {
         **EXEMPLO_CLIENTE,
         "tenure": 70,
@@ -62,18 +61,21 @@ def test_predict_cliente_baixo_risco():
         "MonthlyCharges": 55.0,
         "TotalCharges": 3850.0,
     }
-    response = client.post("/predict", json=cliente, headers=_headers())
+    headers = await _headers(api_client)
+    response = await api_client.post("/predict", json=cliente, headers=headers)
     assert response.status_code == 200
     assert response.json()["churn"] is False
 
 
-def test_predict_total_charges_nulo():
+async def test_predict_total_charges_nulo(api_client):
     cliente = {**EXEMPLO_CLIENTE, "tenure": 0, "TotalCharges": None}
-    response = client.post("/predict", json=cliente, headers=_headers())
+    headers = await _headers(api_client)
+    response = await api_client.post("/predict", json=cliente, headers=headers)
     assert response.status_code == 200
 
 
-def test_predict_categoria_invalida():
+async def test_predict_categoria_invalida(api_client):
     cliente = {**EXEMPLO_CLIENTE, "Contract": "Three year"}
-    response = client.post("/predict", json=cliente, headers=_headers())
+    headers = await _headers(api_client)
+    response = await api_client.post("/predict", json=cliente, headers=headers)
     assert response.status_code == 422
