@@ -167,7 +167,10 @@ else:
                 st.error(f"High churn risk: {prob:.1%}")
             else:
                 st.success(f"Low churn risk: {prob:.1%}")
-            st.bar_chart(dados["probabilities"], color=VERDE)
+            st.bar_chart(
+                {"Churn": [prob], "No churn": [1 - prob]},
+                color=[VERDE, MENTA],
+            )
         elif r.status_code == 401:
             st.session_state.token = None
             st.warning("Expired Session. Login again.")
