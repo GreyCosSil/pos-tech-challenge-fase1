@@ -1,7 +1,18 @@
-# API de previsão de churn para telecomunicações
+# 🤖 API de previsão de churn para telecomunicações
 
 API FastAPI que usa um modelo treinado para prever churn de clientes. Este guia
 explica como configurar o ambiente, iniciar a API e executar os testes integrados.
+
+## 📁 Estrutura do Repositório
+
+* `src/`: Código fonte para pré-processamento, treinamento e predição.
+* `notebooks/`: Análises exploratórias e protótipos de dados.
+* `data/`: Diretório para armazenar os datasets localmente (ignorado pelo Git).
+* `models/`: Diretório para os modelos treinados (ignorado pelo Git).
+* `tests/`: Testes unitários do código.
+* `docs/`: Documentação adicional.
+
+## 🚀 Como Configurar (Setup)
 
 ## Pré-requisitos
 
