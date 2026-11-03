@@ -150,3 +150,11 @@ docker run --rm --env-file .env -p 8000:8000 telco-churn-api
 A API ficará disponível em <http://localhost:8000/docs>. Encerre com `Ctrl+C`.
 Essa imagem contém as dependências de produção para servir a API; para executar
 os testes, use o ambiente Python de desenvolvimento descrito acima.
+
+
+## API em produção no Render
+
+- API: <https://api-telco-churn-prod-93yo.onrender.com>
+- Documentação interativa: <https://api-telco-churn-prod-93yo.onrender.com/docs>
+- Saúde da API: <https://api-telco-churn-prod-93yo.onrender.com/health>
+- Frontend: <https://frontend-telco-churn-93yo.onrender.com>
