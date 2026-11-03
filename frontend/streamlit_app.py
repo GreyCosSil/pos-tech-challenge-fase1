@@ -69,9 +69,9 @@ if "token" not in st.session_state:
 
 if st.session_state.token is None:
     with st.form("login"):
-        username = st.text_input("Usuário")
-        password = st.text_input("Senha", type="password")
-        if st.form_submit_button("Entrar"):
+        username = st.text_input("User")
+        password = st.text_input("Password", type="password")
+        if st.form_submit_button("Login"):
             try:
                 r = requests.post(
                     f"{API_URL}/login",
@@ -79,44 +79,46 @@ if st.session_state.token is None:
                     timeout=60,
                 )
             except requests.ConnectionError:
-                st.error(f"Não foi possível conectar à API em {API_URL}")
+                st.error(f"Unable to reach API in {API_URL}")
             else:
                 if r.status_code == 200:
                     st.session_state.token = r.json()["access_token"]
                     st.rerun()
                 else:
-                    st.error("Usuário ou senha incorretos")
+                    st.error("Incorrect User or Password")
 else:
-    st.success("Autenticado")
+    st.success("User authenticated")
 
-    with st.form("cliente"):
-        st.subheader("Perfil do cliente")
+    with st.form("Client"):
+        st.subheader("Client Profile")
         col1, col2 = st.columns(2)
-        gender = col1.selectbox("Gênero", ["Female", "Male"])
-        senior = col2.selectbox("Idoso (SeniorCitizen)", [0, 1])
-        partner = col1.selectbox("Possui parceiro(a)", SIM_NAO)
-        dependents = col2.selectbox("Possui dependentes", SIM_NAO)
+        gender = col1.selectbox("Gender", ["Female", "Male"])
+        senior = col2.selectbox("SeniorCitizen - 1 for yes", [1, 0])
+        partner = col1.selectbox("Has a partner?", SIM_NAO)
+        dependents = col2.selectbox("Has dependents?", SIM_NAO)
 
-        st.subheader("Serviços")
+        st.subheader("Services")
         col1, col2 = st.columns(2)
-        phone = col1.selectbox("Telefone", SIM_NAO, index=1)
+        phone = col1.selectbox("Telephone", SIM_NAO, index=1)
         multiple_lines = col2.selectbox(
-            "Múltiplas linhas", ["No", "Yes", "No phone service"]
+            "Multiple Lines", ["No", "Yes", "No phone service"]
         )
         internet = col1.selectbox("Internet", ["DSL", "Fiber optic", "No"], index=1)
-        online_security = col2.selectbox("Segurança online", SERVICO_INTERNET)
-        online_backup = col1.selectbox("Backup online", SERVICO_INTERNET)
-        device_protection = col2.selectbox("Proteção de dispositivo", SERVICO_INTERNET)
-        tech_support = col1.selectbox("Suporte técnico", SERVICO_INTERNET)
-        streaming_tv = col2.selectbox("Streaming de TV", SERVICO_INTERNET)
-        streaming_movies = col1.selectbox("Streaming de filmes", SERVICO_INTERNET)
+        online_security = col2.selectbox("Online Security", SERVICO_INTERNET)
+        online_backup = col1.selectbox("Online Backup", SERVICO_INTERNET)
+        device_protection = col2.selectbox("Device Protection", SERVICO_INTERNET)
+        tech_support = col1.selectbox("Technical support", SERVICO_INTERNET)
+        streaming_tv = col2.selectbox("TV Streaming", SERVICO_INTERNET)
+        streaming_movies = col1.selectbox("Movies Streaming", SERVICO_INTERNET)
 
-        st.subheader("Contrato e cobrança")
+        st.subheader("Contract & Charges")
         col1, col2 = st.columns(2)
-        contract = col1.selectbox("Contrato", ["Month-to-month", "One year", "Two year"])
-        paperless = col2.selectbox("Fatura digital", SIM_NAO, index=1)
+        contract = col1.selectbox(
+            "Contract", ["Month-to-month", "One year", "Two year"]
+        )
+        paperless = col2.selectbox("Digital Billing", SIM_NAO, index=1)
         payment = st.selectbox(
-            "Forma de pagamento",
+            "Payment Method",
             [
                 "Electronic check",
                 "Mailed check",
@@ -125,11 +127,11 @@ else:
             ],
         )
         col1, col2, col3 = st.columns(3)
-        tenure = col1.number_input("Meses como cliente", 0, 100, 2)
-        monthly = col2.number_input("Cobrança mensal", 0.0, 500.0, 70.7)
-        total = col3.number_input("Cobrança total", 0.0, 20000.0, 151.65)
+        tenure = col1.number_input("Months as a client", 0, 100, 2)
+        monthly = col2.number_input("Mensal Charge", 0.0, 500.0, 70.7)
+        total = col3.number_input("Total Billing", 0.0, 20000.0, 151.65)
 
-        enviar = st.form_submit_button("Prever churn")
+        enviar = st.form_submit_button("Predict Churn Probability")
 
     if enviar:
         r = requests.post(
@@ -162,17 +164,17 @@ else:
             dados = r.json()
             prob = dados["probabilidade_churn"]
             if dados["churn"]:
-                st.error(f"Alto risco de churn: {prob:.1%}")
+                st.error(f"High churn risk: {prob:.1%}")
             else:
-                st.success(f"Baixo risco de churn: {prob:.1%}")
-            st.bar_chart(dados["probabilidades"], color=VERDE)
+                st.success(f"Low churn risk: {prob:.1%}")
+            st.bar_chart(dados["probabilities"], color=VERDE)
         elif r.status_code == 401:
             st.session_state.token = None
-            st.warning("Sessão expirada. Faça login de novo.")
+            st.warning("Expired Session. Login again.")
             st.rerun()
         else:
             st.error(f"Erro {r.status_code}: {r.text}")
 
-    if st.button("Sair"):
+    if st.button("Log Out"):
         st.session_state.token = None
         st.rerun()
