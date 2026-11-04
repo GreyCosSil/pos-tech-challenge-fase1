@@ -170,6 +170,7 @@ os testes, use o ambiente Python de desenvolvimento descrito acima.
 - Saúde da API: <https://api-telco-churn-prod-93yo.onrender.com/health>
 - Frontend: <https://frontend-telco-churn-93yo.onrender.com>
 
+
 ## 👥 Integrantes do Grupo e Responsabilidades
 
 
@@ -180,3 +181,4 @@ os testes, use o ambiente Python de desenvolvimento descrito acima.
 | **Natalia** | Análise exploratória de dados (EDA) e produção dos vídeos de apresentação |
 | **Pedro** | Desenvolvimento de APIs (backend) e interface gráfica (frontend) |
 | **Thiago** | Pesquisa, treinamento e validação dos modelos de Machine Learning |
+
