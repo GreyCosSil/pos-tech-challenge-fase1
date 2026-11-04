@@ -169,4 +169,16 @@ os testes, use o ambiente Python de desenvolvimento descrito acima.
 - Documentação interativa: <https://api-telco-churn-prod-93yo.onrender.com/docs>
 - Saúde da API: <https://api-telco-churn-prod-93yo.onrender.com/health>
 - Frontend: <https://frontend-telco-churn-93yo.onrender.com>
->>>>>>> origin/stg
+
+
+## 👥 Integrantes do Grupo e Responsabilidades
+
+
+| Integrante | Principais Contribuições |
+| :--- | :--- |
+| **Greyce** | Configuração de esteira CI/CD, gerenciamento de ambientes e infraestrutura |
+| **Luiz** | Implementação e execução de testes integrados e validação de qualidade |
+| **Natalia** | Análise exploratória de dados (EDA) e produção dos vídeos de apresentação |
+| **Pedro** | Desenvolvimento de APIs (backend) e interface gráfica (frontend) |
+| **Thiago** | Pesquisa, treinamento e validação dos modelos de Machine Learning |
+
